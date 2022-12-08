@@ -1,4 +1,4 @@
---
+---
 title: "Reproducible Science - penguins_assignment"
 output: html_document
 ---
@@ -17,7 +17,7 @@ library(dplyr)
 For this assignment, we have to load in the raw data to use. 
 
 ```{r}
-PenguinsRaw <- read.csv("penguins_raw.csv") #Makes an object called PenguinsRaw, which consists of the data which the function read.csv has loaded into R
+PenguinsRaw <- read.csv("data_raw/penguins_raw.csv") #Makes an object called PenguinsRaw, which consists of the data which the function read.csv has loaded into R
 ```
 
 ```{r}
@@ -40,17 +40,35 @@ cleaning <- function(PenguinsRaw){
      select ( -comments)
 }
 
-CleanPenguin <- cleaning(PenguinsRaw) #Now we make an object called CleanPenguin, which contains the raw data with the cleaning function applied to it
+CleanPenguin <- cleaning(PenguinsRaw) #Now we make an object called CleanPenguin,which contains the raw data with the cleaning function applied to it
 
 
 View(CleanPenguin) #Loads up the new object to view, and check that we have indeed made it
 ```
 
-Now that we are working with 'cleaned' data, we can consider which statistical test to run on the data. 
+Now that we are working with 'cleaned' data, we can consider which statistical
+test to run on the data. 
 
-My chosen question is to examine what the mean effects of sex and body mass are on flipper length.I predict that heavier penguins will have larger flippers to help them swim.
+## Statistical Analysis
 
-However, sexual dimorphism is common within biology and so to adjust for that variable, I'm also going to examine the effects of the interaction between sex and body mass on flipper length. To do this, I will use an ANCOVA. 
+My chosen question is to examine what the mean effects of sex and body mass are 
+on flipper length.
+I shall include all three species in the dataset to examine this question, in 
+order to have a larger sample size.
+
+I predict that heavier penguins,  will have larger flippers to help them swim.
+
+However, sexual dimorphism is common within biology and so to adjust for that 
+variable, 
+I'm also going to examine the effects of the interaction between sex and body
+mass on flipper length.
+To do this, I will use an ANCOVA. 
+
+Hypothesis (null): The interaction between sex and flipper length is not
+significant.
+The interaction between body mass and flipper length is not significant.
+The effect of sex is not dependent on body mass for flipper length 
+(and vice versa)
 
 
 ```{r}
@@ -72,35 +90,51 @@ summary(PenguinModel) #Summarise this to check it has worked
 ```
 
 
-Now we have made our linear model, but to test it in ANOVA we must check that it answers certain assumptions of the test.
-These are: random sampling; normality of residuals for each independent variable; and the data should show homogeneity of variance. 
+Now we have made our linear model, but to test it in ANOVA we must check that it
+answers certain assumptions of the test.
+These are: random sampling; normality of residuals for each independent variable; 
+and the data should show homogeneity of variance. 
 
-We shall assume random sampling of the Palmer Penguins dataset for the purposes of this assignment.
+We shall assume random sampling of the Palmer Penguins dataset for the purposes 
+of this assignment.
 
-However, to examine normality and homogeneity of variance, we can run diagnostic plots on the model to visually assess this. 
+However, to examine normality and homogeneity of variance, we can run diagnostic
+plots on the model to visually assess this. 
 
 ```{r}
 plot(PenguinModel, which = 1:2) #Runs standard diagnostic models, selecting only the first two from the four that can be produced, as these examine homogenity and normality respectively
 ```
 
-From a visual assessment, the assumptions seem to be met. There is some deviation from the line on the top-end tail of the q-q plot but this is very small. The points in the residuals-fitted plot do seem equally distributed, supporting our assumption of homogeniety of variance. 
+From a visual assessment, the assumptions seem to be met. There is some
+deviation from the line on the top-end tail of the q-q plot but this is very small.
+The points in the residuals-fitted plot do seem equally distributed, supporting
+our assumption of homogeniety of variance. 
 
-This means we can continue on to run an ANOVA test in r (but since we are using a factor (sex) and a continuous variable, this is what is statistically termed an ANCOVA)
+This means we can continue on to run an ANOVA test in r (but since we are using
+a factor (sex) and a continuous variable, this is what is statistically termed 
+an ANCOVA)
 
 
 ```{r}
 PenguinAnova <- anova(PenguinModel, test = "F") #Runs the model, and puts it in an object called PenguinAnova
 PenguinAnova #To view the ANOVA table
 ```
-An ANCOVA was performed by the code, to analyse the effect of Sex , and Body Mass on the Flipper Length.  
+An ANCOVA was performed by the code, to analyse the effect of Sex , and Body
+Mass on the Flipper Length.  
 
-The analysis revealed that there was not a statistically significant interaction between the effects of Sex and Body Mass (p = 0.5425). 
+The analysis revealed that there was not a statistically significant interaction
+between the effects of Sex and Body Mass (p = 0.5425). 
 
-Simple main effects analysis showed that Sex did have a statistically significant effect on Flipper Length (p = <2e-16, i.e. very close to zero) .
+Simple main effects analysis showed that Sex did have a statistically significant
+effect on Flipper Length (p = <2e-16, i.e. very close to zero) .
  
-Simple main effects analysis showed that Body Mass did have a statistically significant effect on Flipper Length (p = <2e-16).
+Simple main effects analysis showed that Body Mass did have a statistically
+significant effect on Flipper Length (p = <2e-16).
 
-Now we shall plot this as a scatterplot with the model overlaid in order to visually assess interaction. 
+## Plotting the figure
+
+Now we shall plot this as a scatterplot with the model overlaid in order to 
+visually assess interaction. 
 
 ```{r}
 
@@ -122,6 +156,11 @@ labs(x = "Body Mass (g)",
 PlotModel #to view the plot of model 4
 ```
 
-We can see that flipper length increases with body mass regardless of sex, though there is a significant difference between sexes in flipper length. However, we can see that the interaction between sex and body mass is not statistically significant. 
+We can see that flipper length increases with body mass regardless of sex,
+though there is a significant difference between sexes in flipper length.
+However, we can see that the interaction between sex and body mass is not 
+statistically significant. 
 
-This suggests that heavier penguins will indeed have longer flippers. Perhaps, where body mass or flipper length data is missing, once could estimate these values from linear models.
+This suggests that heavier penguins will indeed have longer flippers.
+Perhaps, where body mass or flipper length data is missing, once could estimate
+these values from linear models. 
