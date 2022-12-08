@@ -31,6 +31,7 @@ View(PenguinsRaw) #Load up the data full to see how complete it is. As we can se
 
 ```{r} 
 #Easiest way to "clean" it is by writing a function. This function called "cleaning", will clean column names, remove empty rows, remove columns called comment and delta
+#This function is also in my github folder, for reproducibility
 
 cleaning <- function(PenguinsRaw){
    PenguinsRaw %>%
