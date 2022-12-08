@@ -109,7 +109,7 @@ plot(PenguinModel, which = 1:2) #Runs standard diagnostic models, selecting only
 From a visual assessment, the assumptions seem to be met. There is some
 deviation from the line on the top-end tail of the q-q plot but this is very small.
 The points in the residuals-fitted plot do seem equally distributed, supporting
-our assumption of homogeniety of variance. 
+our assumption of homogeniety of variance. There are very few outliers. 
 
 This means we can continue on to run an ANOVA test in r (but since we are using
 a factor (sex) and a continuous variable, this is what is statistically termed 
