@@ -1,0 +1,127 @@
+--
+title: "Reproducible Science - penguins_assignment"
+output: html_document
+---
+## Q4 
+
+```{r, message = FALSE, warning = FALSE} 
+
+library(palmerpenguins) #Begin by loading the necessary libraries for the task
+library(ggplot2)
+library(janitor)
+library(dplyr) 
+
+#In the R code within the {r} I have specified to hide the messages and warnings, as this takes up a lot of space in the markdown document
+```
+
+For this assignment, we have to load in the raw data to use. 
+
+```{r}
+PenguinsRaw <- read.csv("data_raw/penguins_raw.csv") #Makes an object called PenguinsRaw, which consists of the data which the function read.csv has loaded into R
+```
+
+```{r}
+head(PenguinsRaw) #view table, to check that data has indeed loaded
+names(PenguinsRaw) #Views the column titles, so we can better understand what variables and data we are working with
+```
+
+```{r}
+View(PenguinsRaw) #Load up the data full to see how complete it is. As we can see in this set of data, it contains a lot of missing information ("n/a")
+```
+
+```{r} 
+#Easiest way to "clean" it is by writing a function. This function called "cleaning", will clean column names, remove empty rows, remove columns called comment and delta
+
+cleaning <- function(PenguinsRaw){
+   PenguinsRaw %>%
+     clean_names() %>%
+     remove_empty(c("rows", "cols")) %>%
+     select ( -starts_with("Delta")) %>%
+     select ( -comments)
+}
+
+CleanPenguin <- cleaning(PenguinsRaw) #Now we make an object called CleanPenguin, which contains the raw data with the cleaning function applied to it
+
+
+View(CleanPenguin) #Loads up the new object to view, and check that we have indeed made it
+```
+
+Now that we are working with 'cleaned' data, we can consider which statistical test to run on the data. 
+
+My chosen question is to examine what the mean effects of sex and body mass are on flipper length.I predict that heavier penguins will have larger flippers to help them swim.
+
+However, sexual dimorphism is common within biology and so to adjust for that variable, I'm also going to examine the effects of the interaction between sex and body mass on flipper length. To do this, I will use an ANCOVA. 
+
+
+```{r}
+#Having viewed the CleanPenguin data, we can see there are still n/a values in some of the columns we are not interested in. Here we will remove those blank values so that they don't affect our analysis. We need the package dplyr in order to use the cleaning function described here
+
+library(dplyr) #load package
+
+TotalCleanPenguin <- CleanPenguin %>% filter(!is.na(sex) & !is.na(flipper_length_mm) & !is.na(body_mass_g))  #makes an object called TotalCleanpenguin which is a filtered version of the CleanPenguin data
+
+View(TotalCleanPenguin)  #View this object to check the n/a's have been removed
+```
+
+```{r}
+#Now we make an object called PenguinModel, which is a linear model of the effects of sex, body mass and their interaction on flipper length
+
+PenguinModel <- lm (flipper_length_mm ~ sex + body_mass_g + sex*body_mass_g, TotalCleanPenguin)
+
+summary(PenguinModel) #Summarise this to check it has worked
+```
+
+
+Now we have made our linear model, but to test it in ANOVA we must check that it answers certain assumptions of the test.
+These are: random sampling; normality of residuals for each independent variable; and the data should show homogeneity of variance. 
+
+We shall assume random sampling of the Palmer Penguins dataset for the purposes of this assignment.
+
+However, to examine normality and homogeneity of variance, we can run diagnostic plots on the model to visually assess this. 
+
+```{r}
+plot(PenguinModel, which = 1:2) #Runs standard diagnostic models, selecting only the first two from the four that can be produced, as these examine homogenity and normality respectively
+```
+
+From a visual assessment, the assumptions seem to be met. There is some deviation from the line on the top-end tail of the q-q plot but this is very small. The points in the residuals-fitted plot do seem equally distributed, supporting our assumption of homogeniety of variance. 
+
+This means we can continue on to run an ANOVA test in r (but since we are using a factor (sex) and a continuous variable, this is what is statistically termed an ANCOVA)
+
+
+```{r}
+PenguinAnova <- anova(PenguinModel, test = "F") #Runs the model, and puts it in an object called PenguinAnova
+PenguinAnova #To view the ANOVA table
+```
+An ANCOVA was performed by the code, to analyse the effect of Sex , and Body Mass on the Flipper Length.  
+
+The analysis revealed that there was not a statistically significant interaction between the effects of Sex and Body Mass (p = 0.5425). 
+
+Simple main effects analysis showed that Sex did have a statistically significant effect on Flipper Length (p = <2e-16, i.e. very close to zero) .
+ 
+Simple main effects analysis showed that Body Mass did have a statistically significant effect on Flipper Length (p = <2e-16).
+
+Now we shall plot this as a scatterplot with the model overlaid in order to visually assess interaction. 
+
+```{r}
+
+#This creates an object called PlotModel, which is a ggplot of our interaction. It is also coloured to distinguish between the two versions of the factor sex (male and female), and titled appropriately
+
+PlotModel<- ggplot(TotalCleanPenguin, aes(x = body_mass_g, y = flipper_length_mm, colour = sex)) + 
+  geom_point() +  #Plots the data points
+  geom_smooth(method = 'lm')+
+labs(x = "Body Mass (g)",
+       y = "Flipper Length (mm)",
+     title = "Scatterplot showing effects of Sex and Body Mass on Flipper Length ")+ #adds labels
+  scale_x_continuous() +
+  scale_color_manual(values = c("deeppink1","midnightblue"))+ #adds desired colours
+  theme_bw() # makes background white to see the lines more clearly, so that it is more accessible
+
+#The colours "deeppink1" and "midnightblue" were chosen both as intuitive colours for the variables female and male, but also because these two choices are colourblind friendly for Tritanopia, Protanopia and Deuteranopia. 
+  
+
+PlotModel #to view the plot of model 4
+```
+
+We can see that flipper length increases with body mass regardless of sex, though there is a significant difference between sexes in flipper length. However, we can see that the interaction between sex and body mass is not statistically significant. 
+
+This suggests that heavier penguins will indeed have longer flippers. Perhaps, where body mass or flipper length data is missing, once could estimate these values from linear models.
