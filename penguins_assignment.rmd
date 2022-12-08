@@ -17,7 +17,7 @@ library(dplyr)
 For this assignment, we have to load in the raw data to use. 
 
 ```{r}
-PenguinsRaw <- read.csv("data_raw/penguins_raw.csv") #Makes an object called PenguinsRaw, which consists of the data which the function read.csv has loaded into R
+PenguinsRaw <- read.csv("penguins_raw.csv") #Makes an object called PenguinsRaw, which consists of the data which the function read.csv has loaded into R
 ```
 
 ```{r}
