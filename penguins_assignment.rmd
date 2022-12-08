@@ -151,7 +151,7 @@ labs(x = "Body Mass (g)",
   scale_color_manual(values = c("deeppink1","midnightblue"))+ #adds desired colours
   theme_bw() # makes background white to see the lines more clearly, so that it is more accessible
 
-#The colours "deeppink1" and "midnightblue" were chosen both as intuitive colours for the variables female and male, but also because these two choices are colourblind friendly for Tritanopia, Protanopia and Deuteranopia. 
+#The colours "deeppink1" and "midnightblue" were chosen both as colours for the variables female and male, because these two choices are colourblind friendly for Tritanopia, Protanopia and Deuteranopia. While perhaps un-biological, I think they are intuitive.
   
 
 PlotModel #to view the plot of model 4
